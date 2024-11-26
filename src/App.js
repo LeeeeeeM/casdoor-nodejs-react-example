@@ -16,6 +16,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import SDK from 'casdoor-js-sdk';
 import { config } from "./Setting";
+import { PREFIX } from './const'; 
 
 function App() {
   const [username, setUsername] = useState('');
@@ -26,7 +27,7 @@ function App() {
   useEffect(() => {
     if (window.location.href.indexOf('code') !== -1) {
       if (!sessionStorage.getItem('token')) {
-        sdk.signin("http://localhost:8080").then(res => {
+        sdk.signin(PREFIX).then(res => {
           sessionStorage.setItem('token', res.token);
           setTokenReceived(true);
         });
@@ -36,6 +37,7 @@ function App() {
 
   useEffect(() => {
     if (sessionStorage.getItem('token')) {
+      // return fetch(`${PREFIX}/api/redirect`);
       getInfo().then(res => setInfo(res));
 
       async function getInfo() {
@@ -44,7 +46,7 @@ function App() {
           return;
         }
         else {
-          return fetch(`http://localhost:8080/api/getUserInfo?token=${token}`).then(res => res.json());
+          return fetch(`${PREFIX}/api/getUserInfo?token=${token}`).then(res => res.json());
         }
       }
 
@@ -59,13 +61,13 @@ function App() {
   function gotoSignInPage() {
     document.getElementById('loginMethod').value === "signin"
     ? window.location.href = sdk.getSigninUrl()
-    : sdk.popupSignin("http://localhost:8080");
+    : sdk.popupSignin("/");
   }
 
   function signOut() {
     sessionStorage.removeItem("token");
     setTokenReceived(false);
-    window.location.href = "http://localhost:9000";
+    window.location.href = "/";
   }
 
   return (

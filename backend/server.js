@@ -79,22 +79,28 @@ app.get('/', (req, res) => {
 
 app.get('/api/getUserInfo', (req, res) => {
   let urlObj = url.parse(req.url, true).query;
-  console.log(urlObj)
+  // console.log(urlObj)
   let user = sdk.parseJwtToken(urlObj.token);
-  console.log(user)
+  // console.log(user)
   res.send(JSON.stringify(user));
 });
+
+// app.get('/api/redirect', (req, res) => {
+//   res.redirect(301, '/new-path')
+// });
 
 app.post('*', (req, res) => {
   let urlObj = url.parse(req.url, true).query;
   sdk.getAuthToken(urlObj.code).then(response => {
-    console.log(response)
     const accessToken = response.access_token;
     // const refresh_token = response.refresh_token;
+    res.cookie('token', accessToken.slice(0, 1000), {maxAge: 60 * 1000, httpOnly: true})
+    // let user = sdk.parseJwtToken(accessToken);
+    // console.log(user)
     res.send(JSON.stringify({ token: accessToken }));
   });
 });
 
-app.listen(8080, () => {
-  console.log('Server listening at http://localhost:8080');
+app.listen(8881, () => {
+  console.log('Server listening at http://localhost:8881');
 });
